@@ -1,0 +1,103 @@
+html, body{
+  margin: 0;
+  font-family: Arial;
+}
+
+h1, h2, h3, h4{
+  margin: 0;
+}
+
+a{
+  text-decoration: none;
+}
+
+nav{
+  width: 100%;
+  background: #222222;
+  color: white;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 1.5rem;
+  padding:0.5rem;
+}
+
+nav a{
+  color: white;
+}
+
+nav div{
+  margin: 0 1rem;
+}
+
+.home-links-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content-mid{
+  max-width: 900px;
+  margin: 1rem auto 0 auto;
+  display: grid;
+  grid-template-columns: 25% 25% 25% 25%;
+  grid-gap: 1rem;
+}
+
+.product{
+  position: relative;
+  color: #444444;
+  border: 1px solid #dddddd;
+  padding: 0.4rem;
+  box-shadow: 0.2rem 0.2rem 0.2rem #dddddd, -0.2rem 0.2rem 0.2rem #dddddd;
+}
+
+.product-img-container{
+  object-fit: cover;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 200px;
+}
+
+.product-img-container img{
+  height: 100%;
+}
+
+.product-description{
+  padding: 0.5rem;
+}
+
+.favorite-button{
+  cursor: pointer;
+  position: absolute;
+  bottom: 0.2rem;
+  right: 0.2rem;
+  background: transparent;
+  border: none;
+}
+
+.favorite-button:focus{
+  outline: none;
+}
+
+.favorite-button img{
+  height: 40px;
+  width: 40px;
+}
+
+.favorite-button img:hover{
+  filter: brightness(200%);
+}
+
+.clear-favorites{
+  position: absolute;
+  top: 4rem;
+  left: 0.4rem;
+  border: none;
+  border-radius: 0.2rem;
+  padding: 0.2rem 0.75rem;
+  color: white;
+  font-size: 1.5rem;
+  background: red;
+}

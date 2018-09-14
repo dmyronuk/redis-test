@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include _head %>
+    <script type="application/javascript" src="js/favorites.js"></script>
+  </head>
+  <body>
+    <% include _nav %>
+    <button class="clear-favorites">
+      Clear
+    </button>
+    <div class="content-mid">
+      <% parsedData.forEach(function(elem){ %>
+        <div class="product">
+          <div class="product-img-container">
+            <img class="product-image" src="<%= elem.imgURL %>">
+          </div>
+          <div class="product-description">
+            <div><%= elem.name %> <%= elem.price %></div>
+            <div>SKU: <%= elem.sku %></div>
+          </div>
+        </div>
+      <% }) %>
+    <div>
+  </body>
+</html>
