@@ -18,7 +18,7 @@ $(document).ready(function(){
       dataType: "json",
       contentType: "application/json",
       success: function(){
-        console.log("we did it");
+        console.log("success");
       }
     })
   })
