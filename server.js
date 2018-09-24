@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080;
 const path = require("path");
 const bodyParser = require("body-parser");
+const cookieSession = require("cookie-session");
 
 const redis = require("redis");
 const redisClient = redis.createClient();
@@ -10,8 +11,13 @@ const redisClient = redis.createClient();
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:true}));
 
-let currentUser = "user1";
+app.use(cookieSession({
+  name: "session",
+  keys: ["secretkey"],
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 const getProductData = async (productKey) => {
   return redisClient.hgetall(cur);
@@ -22,8 +28,8 @@ app.get("/", (req, res) => {
 })
 
 app.post("/login", (req, res) => {
-  currentUser = req.body.username;
-  res.json({status: "complete"});
+  req.session.username = req.body.username;
+  res.redirect("/products");
 })
 
 app.get("/products", (req, res) => {
@@ -32,8 +38,9 @@ app.get("/products", (req, res) => {
 
 app.get("/favorites", (req, res) => {
   const multi = redisClient.multi();
+  const favoritesKey = req.session.username + ":favorites";
 
-  redisClient.smembers(currentUser + ":favorites", function(err, productKeys){
+  redisClient.smembers(favoritesKey, function(err, productKeys){
     productKeys.forEach( key => {
       multi.hgetall(key);
     })
@@ -49,7 +56,7 @@ app.get("/favorites", (req, res) => {
 })
 
 app.post("/favorites/delete", (req, res) => {
-  const userFavoritesKey = currentUser + ":favorites";
+  const userFavoritesKey = req.session.username + ":favorites";
   redisClient.del(userFavoritesKey);
   res.json({status: "complete"});
 })
@@ -58,7 +65,7 @@ app.post("/favorites", (req, res) => {
   const sku = req.body.sku;
   const productStr = JSON.stringify(req.body);
   const productKey = "product:" + sku;
-  const userFavoritesKey = currentUser + ":favorites";
+  const userFavoritesKey = req.session.username + ":favorites";
 
   redisClient.sadd(userFavoritesKey, productKey);
 
