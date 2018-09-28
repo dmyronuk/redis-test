@@ -94,6 +94,10 @@ nav div{
   filter: brightness(200%);
 }
 
+.grayscale{
+  filter: grayscale(100%);
+}
+
 .clear-favorites{
   position: absolute;
   top: 4rem;

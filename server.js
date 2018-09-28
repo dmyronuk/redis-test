@@ -17,24 +17,47 @@ app.use(cookieSession({
   name: "session",
   keys: ["secretkey"],
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
-}))
-
-const getProductData = async (productKey) => {
-  return redisClient.hgetall(cur);
-}
+}));
 
 app.get("/", (req, res) => {
   res.render("index");
-})
+});
 
 app.post("/login", (req, res) => {
   req.session.username = req.body.username;
   res.redirect("/products");
-})
+});
 
 app.get("/products", (req, res) => {
-  res.render("products");
-})
+  const multi = redisClient.multi();
+
+  //get user favorites
+  const userFavoritesKey = req.session.username + ":favorites";
+  redisClient.smembers(userFavoritesKey, (err, favorites) => {
+    if(err){
+      console.log(err);
+    }
+
+    data = { favorites };
+
+    //get product data
+    redisClient.smembers("products:keyset", function(err, productKeys){
+      productKeys.forEach( key => {
+        multi.hgetall(key);
+      });
+
+      multi.exec((err, results) => {
+        if(err){
+          console.log(err);
+          res.redirect("/")
+        }else{
+          data.products = results;
+          res.render("products", data);
+        }
+      });
+    });
+  });
+});
 
 app.get("/favorites", (req, res) => {
   const multi = redisClient.multi();
@@ -43,44 +66,36 @@ app.get("/favorites", (req, res) => {
   redisClient.smembers(favoritesKey, function(err, productKeys){
     productKeys.forEach( key => {
       multi.hgetall(key);
-    })
+    });
 
     multi.exec((err, results) => {
       if(err){
-        throw err;
+        console.log(err);
       }else{
         res.render("favorites", { data: results });
       }
-    })
-  })
-})
+    });
+  });
+});
 
 app.post("/favorites/delete", (req, res) => {
   const userFavoritesKey = req.session.username + ":favorites";
   redisClient.del(userFavoritesKey);
   res.json({status: "complete"});
-})
+});
 
 app.post("/favorites", (req, res) => {
-  const sku = req.body.sku;
-  const productStr = JSON.stringify(req.body);
-  const productKey = "product:" + sku;
+  const productKey = "product:" + req.body.sku;
   const userFavoritesKey = req.session.username + ":favorites";
 
-  redisClient.sadd(userFavoritesKey, productKey);
-
-  redisClient.hmset(productKey, [
-    "name", req.body.name,
-    "price", req.body.price,
-    "imgURL", req.body.imgURL
-  ], function(err, data){
+  redisClient.sadd(userFavoritesKey, productKey, (err, result) => {
     if(err){
-      console.log("Error: ", err);
+      console.log(err);
     }
     res.json({status: "complete"});
   });
-})
+});
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
-})
+});

@@ -2,13 +2,8 @@ $(document).ready(function(){
 
   $(".favorite-button").click(function(e){
     var $product = $(e.target).closest(".product");
-    var imgURL = $product.find(".product-img").attr("src");
-
     data = {
-      name: $product.attr("name"),
-      price: $product.attr("price"),
       sku: $product.attr("sku"),
-      imgURL,
     }
 
     $.ajax({
@@ -18,6 +13,7 @@ $(document).ready(function(){
       dataType: "json",
       contentType: "application/json",
       success: function(){
+        $(e.target).removeClass("grayscale");
         console.log("success");
       }
     })
